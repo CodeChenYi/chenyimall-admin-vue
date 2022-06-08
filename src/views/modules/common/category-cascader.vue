@@ -53,8 +53,9 @@ export default {
     },
     paths(v) {
       this.$emit("update:categoryList", v);
+      this.$emit("categoryId", this.categoryList[this.categoryList.length - 1]);
       //还可以使用pubsub-js进行传值
-      this.PubSub.publish("catPath", v);
+      // this.PubSub.publish("catPath", v);
     },
   },
   //方法集合
