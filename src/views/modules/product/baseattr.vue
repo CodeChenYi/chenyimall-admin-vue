@@ -74,12 +74,34 @@
               </template>
             </el-table-column>
             <el-table-column
+              prop="icon"
+              header-align="center"
+              align="center"
+              label="是否允许多个值"
+              width="150"
+            >
+              <template slot-scope="scope">
+                <i class="el-icon-success" v-if="scope.row.valueMany == 1"></i>
+                <i class="el-icon-error" v-if="scope.row.valueMany == 0"></i>
+              </template>
+            </el-table-column>
+            <el-table-column
               prop="valueSelect"
               header-align="center"
               align="center"
               label="可选值列表"
               width="200"
             >
+              <template slot-scope="scope">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="scope.row.valueSelect"
+                  placement="top"
+                >
+                  <el-tag type="success">{{scope.row.valueSelect.split('，')[0] + '...'}}</el-tag>
+                </el-tooltip>
+              </template>
             </el-table-column>
             <el-table-column
               prop="attrType"
@@ -247,7 +269,7 @@ export default {
             limit: this.pageSize,
           }),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.dataList = data.page.list;
             this.totalPage = data.page.totalCount;
           } else {
@@ -269,8 +291,8 @@ export default {
       }).then(({ data }) => {
         this.$message({
           message: "修改显示状态成功",
-          type: "success"
-        })
+          type: "success",
+        });
         this.getDataList();
       });
     },
@@ -285,8 +307,8 @@ export default {
       }).then(({ data }) => {
         this.$message({
           message: "修改检索状态成功",
-          type: "success"
-        })
+          type: "success",
+        });
         this.getDataList();
       });
     },
@@ -298,8 +320,8 @@ export default {
       }).then(({ data }) => {
         this.$message({
           message: "修改启用状态成功",
-          type: "success"
-        })
+          type: "success",
+        });
         this.getDataList();
       });
     },
@@ -315,7 +337,7 @@ export default {
           key: this.dataForm.key,
         }),
       }).then(({ data }) => {
-        if (data && data.code === 0) {
+        if (data && data.code === 20000) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
         } else {
@@ -368,7 +390,7 @@ export default {
           method: "delete",
           data: this.$http.adornData(ids, false),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.$message({
               message: "操作成功",
               type: "success",

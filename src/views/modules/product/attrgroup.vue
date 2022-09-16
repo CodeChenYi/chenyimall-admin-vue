@@ -60,10 +60,10 @@
             >
             </el-table-column>
             <el-table-column
-              prop="sort"
+              prop="categoryName"
               header-align="center"
               align="center"
-              label="排序"
+              label="所属分类名称"
             >
             </el-table-column>
             <el-table-column
@@ -81,10 +81,10 @@
             >
             </el-table-column>
             <el-table-column
-              prop="catelogId"
+              prop="sort"
               header-align="center"
               align="center"
-              label="所属分类id"
+              label="排序"
             >
             </el-table-column>
             <el-table-column
@@ -193,7 +193,7 @@ export default {
       console.log("attrgorp接收到当前组件", data, node, components);
       if (node.level == 3) {
         this.$http({
-          url: this.$http.adornUrl(`/product/attrgroup/list/${data.catId}`),
+          url: this.$http.adornUrl(`/product/attrgroup/listPage/${data.catId}`),
           method: "get",
           params: this.$http.adornParams({
             page: this.pageIndex,
@@ -201,7 +201,7 @@ export default {
             key: this.dataForm.key,
           }),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.dataList = data.page.list;
             this.totalPage = data.page.totalCount;
           } else {
@@ -260,7 +260,7 @@ export default {
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl(`/product/attrgroup/list/${this.catelogId}`),
+        url: this.$http.adornUrl(`/product/attrgroup/list`),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
@@ -268,7 +268,7 @@ export default {
           key: this.dataForm.key,
         }),
       }).then(({ data }) => {
-        if (data && data.code === 0) {
+        if (data && data.code === 20000) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
         } else {
@@ -288,7 +288,7 @@ export default {
           key: this.dataForm.key,
         }),
       }).then(({ data }) => {
-        if (data && data.code === 0) {
+        if (data && data.code === 20000) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
         } else {
@@ -341,7 +341,7 @@ export default {
           method: "delete",
           data: this.$http.adornData(ids, false),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.$message({
               message: "操作成功",
               type: "success",

@@ -253,7 +253,7 @@ export default {
           key: this.dataForm.key,
         }),
       }).then(({ data }) => {
-        if (data && data.code === 0) {
+        if (data && data.code === 20000) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
         } else {
@@ -318,7 +318,7 @@ export default {
           method: "delete",
           data: this.$http.adornData([id], false),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.$message({
               message: "操作成功",
               type: "success",
@@ -372,7 +372,7 @@ export default {
           method: "delete",
           data: this.$http.adornData(ids, false),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.$message({
               message: "操作成功",
               type: "success",

@@ -102,7 +102,7 @@ export default {
             method: "get",
             params: this.$http.adornParams(),
           }).then(({ data }) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 20000) {
               this.dataForm.attrGroupName = data.attrGroup.attrGroupName;
               this.dataForm.sort = data.attrGroup.sort;
               this.dataForm.descript = data.attrGroup.descript;
@@ -134,7 +134,7 @@ export default {
               catelogId: this.dataForm.catelogIdPath[this.dataForm.catelogIdPath.length - 1],
             }),
           }).then(({ data }) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 20000) {
               this.$message({
                 message: "操作成功",
                 type: "success",

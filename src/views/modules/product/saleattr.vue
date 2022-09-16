@@ -20,9 +20,7 @@
             </el-form-item>
             <el-form-item>
               <el-button @click="getDataList()">查询</el-button>
-              <el-button
-                type="primary"
-                @click="addOrUpdateHandle()"
+              <el-button type="primary" @click="addOrUpdateHandle()"
                 >新增</el-button
               >
               <el-button
@@ -52,6 +50,8 @@
               header-align="center"
               align="center"
               label="属性id"
+              fixed="left"
+              width="200"
             >
             </el-table-column>
             <el-table-column
@@ -59,13 +59,7 @@
               header-align="center"
               align="center"
               label="属性名"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="searchType"
-              header-align="center"
-              align="center"
-              label="是否需要检索"
+              width="150"
             >
             </el-table-column>
             <el-table-column
@@ -73,21 +67,82 @@
               header-align="center"
               align="center"
               label="属性图标"
+              width="200"
             >
+              <template slot-scope="scope">
+                <el-image :src="scope.row.icon" :fit="fit"></el-image>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="icon"
+              header-align="center"
+              align="center"
+              label="是否允许多个值"
+              width="150"
+            >
+              <template slot-scope="scope">
+                <i class="el-icon-success" v-if="scope.row.valueMany == 1"></i>
+                <i class="el-icon-error" v-if="scope.row.valueMany == 0"></i>
+              </template>
             </el-table-column>
             <el-table-column
               prop="valueSelect"
               header-align="center"
               align="center"
               label="可选值列表"
+              width="150"
             >
+              <template slot-scope="scope">
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="scope.row.valueSelect"
+                  placement="top"
+                >
+                  <el-tag type="success">{{
+                    scope.row.valueSelect.split("，")[0] + "..."
+                  }}</el-tag>
+                </el-tooltip>
+              </template>
             </el-table-column>
             <el-table-column
               prop="attrType"
               header-align="center"
               align="center"
               label="属性类型"
+              width="150"
             >
+              <template slot-scope="scope">
+                <p v-if="scope.row.attrType == 2">销售属性和基本属性</p>
+                <p v-if="scope.row.attrType == 0">销售属性</p>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="categoryName"
+              header-align="center"
+              align="center"
+              label="所属分类"
+              width="120"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="searchType"
+              header-align="center"
+              align="center"
+              label="是否需要检索"
+              width="150"
+            >
+              <template slot-scope="scope">
+                <el-switch
+                  @change="
+                    updateSearchType(scope.row.attrId, scope.row.searchType)
+                  "
+                  v-model="scope.row.searchType"
+                  :inactive-value="0"
+                  :active-value="1"
+                >
+                </el-switch>
+              </template>
             </el-table-column>
             <el-table-column
               prop="enable"
@@ -95,13 +150,17 @@
               align="center"
               label="启用状态"
             >
-            </el-table-column>
-            <el-table-column
-              prop="catelogId"
-              header-align="center"
-              align="center"
-              label="所属分类"
-            >
+              <template slot-scope="scope">
+                <el-switch
+                  @change="
+                    updateEnableState(scope.row.attrId, scope.row.enable)
+                  "
+                  v-model="scope.row.enable"
+                  :inactive-value="0"
+                  :active-value="1"
+                >
+                </el-switch>
+              </template>
             </el-table-column>
             <el-table-column
               prop="showDesc"
@@ -109,6 +168,17 @@
               align="center"
               label="快速展示"
             >
+              <template slot-scope="scope">
+                <el-switch
+                  @change="
+                    updateShowDescState(scope.row.attrId, scope.row.showDesc)
+                  "
+                  v-model="scope.row.showDesc"
+                  :inactive-value="0"
+                  :active-value="1"
+                >
+                </el-switch>
+              </template>
             </el-table-column>
             <el-table-column
               fixed="right"
@@ -156,7 +226,7 @@
 </template>
 
 <script>
-import Category from '../common/category';
+import Category from "../common/category";
 import AddOrUpdate from "./sale-attr-add-or-update";
 export default {
   data() {
@@ -174,7 +244,8 @@ export default {
     };
   },
   components: {
-    AddOrUpdate, Category
+    AddOrUpdate,
+    Category,
   },
   activated() {
     this.getDataList();
@@ -184,7 +255,7 @@ export default {
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/product/attr/list/${attrType}"),
+        url: this.$http.adornUrl("/product/attr/list/SaleInfo"),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
@@ -192,7 +263,7 @@ export default {
           key: this.dataForm.key,
         }),
       }).then(({ data }) => {
-        if (data && data.code === 0) {
+        if (data && data.code === 20000) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
         } else {
@@ -242,10 +313,10 @@ export default {
       ).then(() => {
         this.$http({
           url: this.$http.adornUrl("/product/attr/delete"),
-          method: "post",
+          method: "delete",
           data: this.$http.adornData(ids, false),
         }).then(({ data }) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 20000) {
             this.$message({
               message: "操作成功",
               type: "success",
@@ -258,6 +329,51 @@ export default {
             this.$message.error(data.msg);
           }
         });
+      });
+    },
+    updateShowDescState(attrId, showDesc) {
+      this.$http({
+        url: this.$http.adornUrl("/product/attr/updateShowDescState"),
+        method: "put",
+        data: this.$http.adornData(
+          { attrId: attrId, showDesc: showDesc },
+          false
+        ),
+      }).then(({ data }) => {
+        this.$message({
+          message: "修改显示状态成功",
+          type: "success",
+        });
+        this.getDataList();
+      });
+    },
+    updateSearchType(attrId, searchType) {
+      this.$http({
+        url: this.$http.adornUrl("/product/attr/updateSearchType"),
+        method: "put",
+        data: this.$http.adornData(
+          { attrId: attrId, searchType: searchType },
+          false
+        ),
+      }).then(({ data }) => {
+        this.$message({
+          message: "修改检索状态成功",
+          type: "success",
+        });
+        this.getDataList();
+      });
+    },
+    updateEnableState(attrId, enable) {
+      this.$http({
+        url: this.$http.adornUrl("/product/attr/updateEnableState"),
+        method: "put",
+        data: this.$http.adornData({ attrId: attrId, enable: enable }, false),
+      }).then(({ data }) => {
+        this.$message({
+          message: "修改启用状态成功",
+          type: "success",
+        });
+        this.getDataList();
       });
     },
   },

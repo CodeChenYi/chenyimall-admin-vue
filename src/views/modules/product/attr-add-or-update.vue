@@ -18,10 +18,20 @@
       <el-form-item label="属性图标" prop="icon">
         <el-input v-model="dataForm.icon" placeholder="属性图标"></el-input>
       </el-form-item>
+      <el-form-item label="是否允许多个值" prop="searchType">
+        <el-switch
+          v-model="dataForm.valueMany"
+          :inactive-value="0"
+          :active-value="1"
+          active-text="启用"
+          inactive-text="禁用"
+        >
+        </el-switch>
+      </el-form-item>
       <el-form-item label="可选值列表" prop="valueSelect">
         <el-input
           v-model="dataForm.valueSelect"
-          placeholder="可选值列表"
+          placeholder="可选值列表，多个值使用逗号分割"
         ></el-input>
         <!-- <el-select v-model="dataForm.valueSelect" multiple filterable placeholder="请选择">
           <el-option
@@ -33,10 +43,10 @@
         </el-select> -->
       </el-form-item>
       <el-form-item label="属性类型" prop="attrType">
-        <el-select v-model="dataForm.attrType" placeholder="请选择">
-          <el-option label="销售属性" :value="0"> </el-option>
+        <el-select v-model="dataForm.attrType" placeholder="请选择" clearable>
+          <el-option label="销售属性" :value="0" disabled> </el-option>
           <el-option label="基本属性" :value="1"> </el-option>
-          <el-option label="两项都是" :value="2"> </el-option>
+          <!-- <el-option label="两项都是" :value="2"> </el-option> -->
         </el-select>
       </el-form-item>
       <el-form-item label="所属分类" prop="catelogId">
@@ -162,11 +172,13 @@ export default {
       }
     },
     visible() {
+      this.attrGroupList = [];
       this.clearCount = 0;
       if (this.visible === false) {
         console.log("----------------------------");
         this.dataForm.categoryPath = [];
         this.categoryPath = [];
+        
       }
     },
   },
@@ -179,7 +191,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({}),
       }).then(({ data }) => {
-        this.attrGroupList = data.page.list;
+        this.attrGroupList = data.list;
       });
     },
     init(id) {
@@ -195,7 +207,7 @@ export default {
             method: "get",
             params: this.$http.adornParams(),
           }).then(({ data }) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 20000) {
               this.dataForm = data.attr;
               this.categoryPath = data.attr.categoryPath;
               this.attrGroupList[0] = {
@@ -227,9 +239,10 @@ export default {
               catelogId: this.categoryPath[this.categoryPath.length - 1],
               showDesc: this.dataForm.showDesc,
               attrGroupId: this.dataForm.attrGroupId,
+              valueMany: this.dataForm.valueMany
             }),
           }).then(({ data }) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 20000) {
               this.$message({
                 message: "操作成功",
                 type: "success",
